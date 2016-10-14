@@ -16,19 +16,20 @@
   "bin": {
     "reangular": "bin/reangular"
   },
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "main": "lib/main.js",
+  "typings": "lib/main.d.ts",
   "scripts": {
     "clean": "rimraf lib",
     "lint": "tslint --format verbose 'src/**/*.ts'",
     "build": "npm run clean && npm run lint && echo Using TypeScript && tsc --version && tsc --pretty",
-    "test": "npm run build && mocha --compilers ts:ts-node/register --recursive test/**/*-spec.ts",
+    "test": "npm run build && mocha --compilers ts:ts-node/register --recursive test/**/*.spec.ts",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch",
-    "start" : "npm run build && node lib/index.js",
-    "debug" : "npm run build && node-debug lib/index.js"
+    "start": "npm run build && node lib/main.js",
+    "debug": "npm run build && node-debug lib/main.js"
   },
   "dependencies": {
+    "change-case": "^3.0.0"
   },
   "devDependencies": {
     "@types/chai": "3.4.30",
