@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as changeCase from 'change-case';
 import * as core from './core';
+import * as replacer from './replacer';
 
 function recurse(file: string, include?: (s: string) => boolean): string[] {
     include = include || function() { return true };
@@ -80,6 +81,11 @@ function main() {
 
         var replacementName = core.extractDirectiveNameFromFile(directive.file);
         if (replacementName != null) {
+
+            replacer.replaceToken(directive, replacementName.declarationName);
+            allDirectiveUsages.forEach(token => {
+                replacer.replaceToken(token, replacementName.tagName);
+            });
 
         } else {
             console.error('Could not infer directive name!');

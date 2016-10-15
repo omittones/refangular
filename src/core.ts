@@ -5,8 +5,8 @@ export class Token {
     constructor(
         public name: string,
         public file: string,
-        private definition: string,
-        private definitionIndex: number) {
+        public definition: string,
+        public definitionIndex: number) {
     }
 }
 
