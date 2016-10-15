@@ -34,15 +34,7 @@ export function findDirectiveUsage(path: string, directive: core.Token): core.To
 
 export function findDirectives(path: string): core.Token[] {
     var contents = fs.readFileSync(path, 'utf8');
-    var regex: RegExp = /\.\s*directive\(["']([\w\.\(\)]*)['"][^\w]/gm;
-    let directives: core.Token[] = [];
-    let match: RegExpExecArray = null;
-    while ((match = regex.exec(contents)) !== null) {
-        console.assert(match.length === 2, 'Match should have only one group!');
-        var definition = new core.Token(match[1], path, match[0], match.index);
-        directives.push(definition);
-    }
-    return directives;
+    return core.matchDirectiveCalls(path, contents);
 }
 
 function main() {
@@ -68,6 +60,7 @@ function main() {
 
     console.log(`      Directive files: ${endsWithDirective.length}`);
     console.log(`Directive definitions: ${directiveDefinition.length}`);
+    console.log();
 
     var allFiles = htmlFiles.concat(sourceFiles);
 
@@ -84,6 +77,10 @@ function main() {
             }
         });
         console.log(`      - totaling ${allDirectiveUsages.length} times`);
+
+
+
+
     });
 }
 

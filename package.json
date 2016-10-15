@@ -9,24 +9,25 @@
     ""
   ],
   "files": [
-    "lib",
+    "obj",
     "bin",
     "test"
   ],
   "bin": {
     "reangular": "bin/reangular"
   },
-  "main": "lib/main.js",
-  "typings": "lib/main.d.ts",
+  "main": "obj/src/main.js",
+  "typings": "obj/src/main.d.ts",
   "scripts": {
-    "clean": "rimraf lib",
+    "clean": "rimraf obj",
     "lint": "tslint --format verbose 'src/**/*.ts'",
-    "build": "npm run clean && npm run lint && echo Using TypeScript && tsc --version && tsc --pretty",
-    "test": "npm run build && mocha --compilers ts:ts-node/register --recursive test/**/*.spec.ts",
+    "build": "npm run lint && echo Using TypeScript && tsc --version && tsc --pretty",
+    "test": "mocha --recursive obj/test/**/*.spec.js",
+    "test:debug": "mocha --debug --debug-brk --recursive obj/test/**/*.spec.js",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch",
-    "start": "npm run build && node lib/main.js",
-    "debug": "npm run build && node-debug lib/main.js"
+    "start": "npm run build && node obj/src/main.js",
+    "debug": "npm run build && node-debug obj/src/main.js"
   },
   "dependencies": {
     "change-case": "^3.0.0"
@@ -38,7 +39,6 @@
     "chai": "^3.5.0",
     "mocha": "^3.0.1",
     "rimraf": "^2.5.4",
-    "ts-node": "^1.2.2",
     "tslint": "3.14.0-dev.1",
     "typescript": "2.0.0"
   },

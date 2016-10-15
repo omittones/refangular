@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-var reangular = require('../lib/main.js');
+var reangular = require('../obj/main.js');

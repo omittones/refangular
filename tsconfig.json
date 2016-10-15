@@ -5,15 +5,14 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "outDir": "./lib",
+    "outDir": "./obj",
     "preserveConstEnums": true,
     "removeComments": true,
     "sourceMap": true
   },
   "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "**/*-spec.ts"
+    "src/**/*",
+    "test/**/*",
+    "node_modules/@types/**/*.d.ts"
   ]
 }
