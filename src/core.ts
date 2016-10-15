@@ -20,18 +20,19 @@ export function extractDirectiveNameFromFile(path: string): DirectiveName {
     const directiveToken = '.directive';
 
     var directive = mpath.parse(path);
+    var parent = mpath.parse(directive.dir);
 
-    if (!directive.name.endsWith(directiveToken))
-        return null;
+    if (directive.name.endsWith(directiveToken)) {
+        var tagName = directive.name.substring(0, directive.name.length - directiveToken.length);
+        if (tagName.startsWith(parent.name)) {
+            return {
+                declarationName: mchangeCase.camel(tagName),
+                tagName: tagName
+            };
+        }
+    }
 
-    var tagName = directive.name.substring(0, directive.name.length - directiveToken.length);
-
-    console.assert(tagName.startsWith(directive.dir));
-
-    return {
-        declarationName: mchangeCase.pascal(tagName),
-        tagName: tagName
-    };
+    return null;
 }
 
 export function matchDirectiveCalls(path: string, source: string) {

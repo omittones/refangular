@@ -78,9 +78,12 @@ function main() {
         });
         console.log(`      - totaling ${allDirectiveUsages.length} times`);
 
+        var replacementName = core.extractDirectiveNameFromFile(directive.file);
+        if (replacementName != null) {
 
-
-
+        } else {
+            console.error('Could not infer directive name!');
+        }
     });
 }
 
