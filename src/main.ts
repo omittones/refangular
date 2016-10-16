@@ -1,17 +1,17 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as changeCase from 'change-case';
-import * as core from './core';
-import * as replacer from './replacer';
+import * as mfs from 'fs';
+import * as mpath from 'path';
+import * as mchangeCase from 'change-case';
+import * as mcore from './core';
+import * as msfm from './source-file-manager';
 
 function recurse(file: string, include?: (s: string) => boolean): string[] {
     include = include || function() { return true };
 
     let output: string[] = [];
-    let files = fs.readdirSync(file);
+    let files = mfs.readdirSync(file);
     for (let i = 0; i < files.length; i++) {
-        var current = path.join(file, files[i]);
-        var stat = fs.statSync(current);
+        var current = mpath.join(file, files[i]);
+        var stat = mfs.statSync(current);
         if (stat.isFile()) {
             if (include(current))
                 output.push(current);
@@ -27,24 +27,34 @@ function recurse(file: string, include?: (s: string) => boolean): string[] {
     return output;
 }
 
-export function findDirectiveUsage(path: string, directive: core.Token): core.Token[] {
-    var directiveTag = changeCase.paramCase(directive.name);
-    var contents = fs.readFileSync(path, 'utf8');
-    return core.matchHtmlTags(path, contents, directiveTag);
+class AngularManager {
+
+    constructor(private manager: msfm.SourceFileManager) {
+    }
+
+    public findDirectiveUsage(path: string, directive: mcore.Token): mcore.Token[] {
+        var directiveTag = mchangeCase.paramCase(directive.name);
+        var contents = this.manager.load(path);
+        return mcore.matchHtmlTags(path, contents, directiveTag);
+    }
+
+    public findDirectives(path: string): mcore.Token[] {
+        var contents = this.manager.load(path);
+        return mcore.matchDirectiveCalls(path, contents);
+    }
 }
 
-export function findDirectives(path: string): core.Token[] {
-    var contents = fs.readFileSync(path, 'utf8');
-    return core.matchDirectiveCalls(path, contents);
-}
 
 function main() {
+
+    var sourceManager = new msfm.SourceFileManager(mfs);
+    var angularManager = new AngularManager(sourceManager);
 
     var sourceFiles = recurse('D:/Code/neogov/platform/src/WebApp/scripts/app', s => s.endsWith('.ts') || s.endsWith('.js'));
     var htmlFiles = recurse('D:/Code/neogov/platform/src/WebApp', s => s.endsWith('.cshtml') || s.endsWith('.html'));
 
     var endsWithDirective: string[] = [];
-    var directiveDefinition: core.Token[] = [];
+    var directiveDefinition: mcore.Token[] = [];
 
     sourceFiles.forEach(srcFile => {
 
@@ -53,7 +63,7 @@ function main() {
             endsWithDirective.push(srcFile);
         }
 
-        var directives = findDirectives(srcFile);
+        var directives = angularManager.findDirectives(srcFile);
         if (directives.length > 0) {
             directiveDefinition = directiveDefinition.concat(directives);
         }
@@ -69,9 +79,9 @@ function main() {
 
         console.log(`-- ${directive.name} ------ ${directive.file}`)
 
-        let allDirectiveUsages: core.Token[] = [];
+        let allDirectiveUsages: mcore.Token[] = [];
         allFiles.forEach(file => {
-            var usesInFile = findDirectiveUsage(file, directive);
+            var usesInFile = angularManager.findDirectiveUsage(file, directive);
             if (usesInFile.length > 0) {
                 console.log(`      - used ${usesInFile.length} times in ${file}`);
                 allDirectiveUsages = allDirectiveUsages.concat(usesInFile);
@@ -79,18 +89,20 @@ function main() {
         });
         console.log(`      - totaling ${allDirectiveUsages.length} times`);
 
-        var replacementName = core.extractDirectiveNameFromFile(directive.file);
+        var replacementName = mcore.extractDirectiveNameFromFile(directive.file);
         if (replacementName != null) {
 
-            replacer.replaceToken(directive, replacementName.declarationName);
+            sourceManager.replaceToken(directive, replacementName.declarationName);
             allDirectiveUsages.forEach(token => {
-                replacer.replaceToken(token, replacementName.tagName);
+                sourceManager.replaceToken(token, replacementName.tagName);
             });
 
         } else {
             console.error('Could not infer directive name!');
         }
     });
+
+    //sourceManager.flush();
 }
 
 main();
