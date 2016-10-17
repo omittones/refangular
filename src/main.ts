@@ -43,8 +43,6 @@ function checkProject(root: string) {
 
 function main() {
 
-    console.log(process.argv);
-
     var dryRun : boolean;
     var projectRoot = mpath.resolve('.');
     if (process.argv.length > 2) {
