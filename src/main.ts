@@ -33,7 +33,24 @@ function main() {
     var angularManager = new AngularManager(sourceManager);
 
     var sourceFiles = recurse('D:/Code/neogov/platform/src/WebApp/scripts/app', s => s.endsWith('.ts') || s.endsWith('.js'));
-    var htmlFiles = recurse('D:/Code/neogov/platform/src/WebApp', s => s.endsWith('.cshtml') || s.endsWith('.html'));
+    var htmlFiles = recurse('D:/Code/neogov/platform/src/WebApp', s => {
+
+        s = mpath.relative('D:/Code/neogov/platform/src/WebApp', s);
+        if (s.endsWith('.cshtml') || s.endsWith('.html')) {
+            if (s.startsWith('Content'))
+                return false;
+            if (s.startsWith('assets'))
+                return false;
+            if (s.startsWith('vendor'))
+                return false;
+            if (s.startsWith('less'))
+                return false;
+            if (s.startsWith('css'))
+                return false;
+            return true;
+        }
+        return false;
+    });
 
     var endsWithDirective: string[] = [];
     sourceFiles.forEach(srcFile => {
