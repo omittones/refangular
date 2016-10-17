@@ -1,2 +1,0 @@
-#!/usr/bin/env node
-var reangular = require('../obj/src/main.js');

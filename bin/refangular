@@ -1,0 +1,2 @@
+#!/usr/bin/env node
+var refangular = require('../obj/src/main.js');

@@ -1,9 +1,9 @@
 {
-  "name": "reangular",
+  "name": "refangular",
   "version": "0.0.1",
-  "description": "reangular",
+  "description": "refangular",
   "license": "MIT",
-  "repository": "https://github.com/omittones/reangular.git",
+  "repository": "https://github.com/omittones/refangular.git",
   "author": "augustin.juricic@gmail.com",
   "keywords": [
     ""
@@ -14,7 +14,7 @@
     "test"
   ],
   "bin": {
-    "reangular": "bin/reangular"
+    "refangular": "bin/refangular"
   },
   "main": "obj/src/main.js",
   "typings": "obj/src/main.d.ts",
