@@ -1,12 +1,7 @@
-import { Token } from './core';
+import { Token, IFileSystem, ISourceFileManager } from './core';
 import * as mpath from 'path';
 
-export interface IFileSystem {
-    readFileSync(filename: string, options: { encoding: string; flag?: string; }): string;
-    writeFileSync(filename: string, data: any, options?: { encoding?: string; mode?: string; flag?: string; }): void;
-}
-
-export class SourceFileManager {
+export default class SourceFileManager implements ISourceFileManager {
 
     private map: Map<string, string>;
     private dirty: string[];
@@ -48,17 +43,5 @@ export class SourceFileManager {
                 encoding: 'utf8'
             });
         });
-    }
-
-    public replaceToken(token: Token, replacementName: string) {
-
-        var content = this.load(token.file);
-
-        var newDefinition = token.definition.replace(token.name, replacementName);
-        var begin = content.substr(0, token.definitionIndex);
-        var end = content.substring(token.definitionIndex + token.definition.length);
-        content = begin + newDefinition + end;
-
-        this.save(token.file, content);
     }
 }

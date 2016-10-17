@@ -10,26 +10,85 @@ export class Token {
     }
 }
 
+export class TokenCollection {
+
+    constructor(
+        private tokens: Token[],
+        private manager: ISourceFileManager) {
+    }
+
+    public add(tokens: Token[]) {
+        this.tokens = this.tokens.concat(tokens);
+    }
+
+    public replaceToken(token: Token, replacementName: string) {
+
+        var content = this.manager.load(token.file);
+
+        var newDefinition = token.definition.replace(token.name, replacementName);
+        var sizeDiff = newDefinition.length - token.definition.length;
+        var begin = content.substr(0, token.definitionIndex);
+        var end = content.substring(token.definitionIndex + token.definition.length);
+        content = begin + newDefinition + end;
+
+        token.definition = newDefinition;
+        token.name = replacementName;
+
+        this.tokens.forEach(t => {
+            if (t.file === token.file &&
+                t.definitionIndex > token.definitionIndex) {
+                t.definitionIndex += sizeDiff;
+            }
+        });
+
+        this.manager.save(token.file, content);
+    }
+}
+
+export interface ISourceFileManager {
+    load(file: string): string;
+    save(file: string, content: string): void;
+    flush(): void;
+}
+
+export interface IFileSystem {
+    readFileSync(filename: string, options: { encoding: string; flag?: string; }): string;
+    writeFileSync(filename: string, data: any, options?: { encoding?: string; mode?: string; flag?: string; }): void;
+}
+
 export interface DirectiveName {
     declarationName: string;
     tagName: string;
 }
 
-export function extractDirectiveNameFromFile(path: string): DirectiveName {
+export function extractDirectiveNameFromFile(rootPath: string, filePath: string): DirectiveName {
 
     const directiveToken = '.directive';
+    rootPath = mpath.resolve(rootPath);
+    filePath = mpath.resolve(filePath);
 
-    var directive = mpath.parse(path);
-    var parent = mpath.parse(directive.dir);
+    var relativePath = mpath.relative(rootPath, filePath);
+    if (relativePath) {
+        var file = mpath.parse(relativePath);
+        if (file.name.endsWith(directiveToken)) {
+            var name = file.name.substring(0, file.name.length - directiveToken.length);
+            file = mpath.parse(file.dir);
 
-    if (directive.name.endsWith(directiveToken)) {
-        var tagName = directive.name.substring(0, directive.name.length - directiveToken.length);
-        if (tagName.startsWith(parent.name)) {
-            return {
-                declarationName: mchangeCase.camel(tagName),
-                tagName: tagName
-            };
+            if (name.startsWith(file.name)) {
+                file = mpath.parse(file.dir);
+                while (file.name != '') {
+                    name = file.name + '-' + name;
+                    file = mpath.parse(file.dir);
+                }
+
+                return {
+                    declarationName: mchangeCase.camel(name),
+                    tagName: name
+                };
+            }
         }
+    } else {
+        throw 'Could not determine relative path!';
     }
 
     return null;
