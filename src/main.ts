@@ -115,7 +115,7 @@ function main() {
 
         angularManager.logStatistics();
 
-        let naming = mcore.extractDirectiveNameFromFile.bind(null, 'D:/Code/neogov/platform/src/WebApp/scripts/app');
+        let naming = mcore.extractDirectiveNameFromFile.bind(null, config.sourceDir);
 
         angularManager.tidyUp(naming);
 
