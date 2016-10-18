@@ -81,20 +81,24 @@ export default class AngularManager {
 
     public tidyUp(fileToDirective: (file:string) => mcore.DirectiveName): void {
 
-        this.directives.forEach(current => {
+        this.directives.forEach(directive => {
 
-            var currentTag = paramCase(current.name);
-            var future = fileToDirective(current.file);
-            if (future == null) {
-                throw `Failed to infer directive name in ${current.file}`;
+            var directiveTag = paramCase(directive.name);
+            var renamed = fileToDirective(directive.file);
+            if (renamed == null) {
+                throw `Failed to infer directive name in ${directive.file}`;
+            }
 
-            } else if (future.tagName != currentTag) {
+            console.log(`\nPROCESSING ${directive.file}`);
+            if (renamed.tagName != directiveTag) {
 
-                this.tokens.replaceToken(current, future.declarationName);
+                console.log(`    JS: Replacing ${directive.name} with ${renamed.declarationName}`);
+                this.tokens.replaceToken(directive, renamed.declarationName);
 
                 this.htmls.forEach(html => {
-                    if (html.name === currentTag) {
-                        this.tokens.replaceToken(html, future.tagName);
+                    if (html.name === directiveTag) {
+                        console.log(`  HTML: Replacing ${html.name} with ${renamed.tagName}`);
+                        this.tokens.replaceToken(html, renamed.tagName);
                     }
                 });
             }
